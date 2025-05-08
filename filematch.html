@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reconciliation Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+  </head>
+  <body class="bg-gray-100 p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
+        Reconciliation Dashboard
+    </h1>
+
+    <!-- Input Fields -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div>
+        <label for="names" class="block font-semibold text-gray-700">Names</label>
+        <textarea id="names" placeholder="One per line" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
+      </div>
+      <div>
+        <label for="ids" class="block font-semibold text-gray-700">ID's of 1st file</label>
+        <textarea id="ids" placeholder="One per line" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
+      </div>
+      <div>
+        <label for="biometricIds" class="block font-semibold text-gray-700">ID's of 2nd file</label>
+        <textarea id="biometricIds" placeholder="One per line" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-4 mb-6">
+      <button onclick="addBulkRows()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded">
+        Add Bulk Data
+      </button>
+      <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded">
+        Export to Excel
+      </button>
+    </div>
+
+    <!-- Attendance Table -->
+    <div class="overflow-x-auto bg-white rounded shadow-md p-4">
+      <table id="manpowerTable" class="min-w-full border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700 text-sm">
+            <th class="border px-3 py-2">SN</th>
+            <th class="border px-3 py-2">Name</th>
+            <th class="border px-3 py-2">ID's of 1st file</th>
+            <th class="border px-3 py-2">ID's of 2nd file</th>
+            <th class="border px-3 py-2">Result</th>
+          </tr>
+        </thead>
+        <tbody class="text-center text-sm bg-white">
+          <!-- Rows will be added dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      let snCounter = 1;
+
+      function addBulkRows() {
+        const names = document
+          .getElementById("names")
+          .value.trim()
+          .split("\n")
+          .map((n) => n.trim());
+        const ids = document
+          .getElementById("ids")
+          .value.trim()
+          .split("\n")
+          .map((i) => i.trim());
+        const biometricIds = new Set(
+          document
+            .getElementById("biometricIds")
+            .value.trim()
+            .split("\n")
+            .map((b) => b.trim())
+        );
+
+        const tableBody = document.querySelector("#manpowerTable tbody");
+        tableBody.innerHTML = "";
+
+        if (names.length !== ids.length) {
+          alert("Names and IDs must have the same number of rows!");
+          return;
+        }
+
+        for (let i = 0; i < names.length; i++) {
+          const name = names[i];
+          const id = ids[i];
+          const biometricId = biometricIds.has(id) ? id : "Not Match";
+          const attendance = biometricId === "Not Match" ? "Not Find" : "Find";
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="border px-2 py-1">${snCounter++}</td>
+            <td class="border px-2 py-1">${name}</td>
+            <td class="border px-2 py-1">${id}</td>
+            <td class="border px-2 py-1">${biometricId}</td>
+            <td class="border px-2 py-1">${attendance}</td>
+          `;
+          tableBody.appendChild(row);
+        }
+
+        biometricIds.forEach((bioId) => {
+          if (!ids.includes(bioId)) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td class="border px-2 py-1">${snCounter++}</td>
+              <td class="border px-2 py-1 text-red-600">Not in List</td>
+              <td class="border px-2 py-1 text-red-600">Not in List</td>
+              <td class="border px-2 py-1">${bioId}</td>
+              <td class="border px-2 py-1 text-red-600">Not Match</td>
+            `;
+            tableBody.appendChild(row);
+          }
+        });
+
+        // Clear inputs
+        document.getElementById("names").value = "";
+        document.getElementById("ids").value = "";
+        document.getElementById("biometricIds").value = "";
+      }
+
+      function exportToExcel() {
+        const table = document.getElementById("manpowerTable");
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.table_to_sheet(table);
+        XLSX.utils.book_append_sheet(wb, ws, "Manpower Attendance");
+        XLSX.writeFile(wb, "manpower_attendance.xlsx");
+      }
+    </script>
+  </body>
+</html>
