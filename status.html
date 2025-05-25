@@ -2,81 +2,133 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Staff Leave & Status Log</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+
+      .password-container {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .password-container input {
+        padding: 8px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .password-container button {
+        padding: 8px 12px;
+        margin-top: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      h3 {
+        color: #007bff;
+        text-align: center;
+      }
+
+      form {
+        padding: 20px;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        grid-gap: 15px;
+        max-width: 650px;
+        width: 100%;
+      }
+
+      label {
+        font-weight: bold;
+        align-self: center;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #007bff;
+        outline: none;
+      }
+
+      button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+        grid-column: span 2;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+      }
+    </style>
   </head>
-  <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-    <div id="formContainer" class="w-full max-w-5xl space-y-6">
-      <h3 class="text-2xl font-bold text-blue-700 text-center">Staff Leave & Status Log</h3>
+  <body>
+    <div class="password-container" id="passwordContainer">
+      <h3>Enter Password</h3>
+      <input type="password" id="passwordInput" placeholder="Enter Password" />
+      <button onclick="checkPassword()">Submit</button>
+    </div>
 
-      <!-- API Key Input -->
-      <div class="mb-4 flex justify-center">
-        <input
-          type="password"
-          id="apiKeyInput"
-          placeholder="Enter API Key"
-          class="p-2 border border-gray-300 rounded w-64"
-          autocomplete="off"
-          spellcheck="false"
-        />
-      </div>
+    <div id="formContainer" class="hidden">
+      <h3>Staff Leave & Status Log</h3>
+      <form id="employeeForm">
+        <label for="id">Employee ID:</label>
+        <input type="text" id="id" name="Id" required />
 
-      <!-- Tabs -->
-      <div class="flex justify-center space-x-2">
-        <button onclick="toggleSection('submitSection')" class="px-6 py-2 border border-blue-600 text-blue-600 rounded-l-lg hover:bg-blue-600 hover:text-white transition">Submit Entry</button>
-        <button onclick="toggleSection('fetchSection')" class="px-6 py-2 border border-blue-600 text-blue-600 rounded-r-lg hover:bg-blue-600 hover:text-white transition">Fetch & Filter</button>
-      </div>
+        <label for="name">Employee Name:</label>
+        <input type="text" id="name" name="Name" required />
 
-      <!-- Submit Form Section -->
-      <div id="submitSection" class="bg-white p-6 rounded-lg shadow-md">
-        <form id="employeeForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="id" class="block font-semibold mb-1">Employee ID</label>
-            <input type="text" id="id" name="Id" required class="w-full p-2 border border-gray-300 rounded" />
-          </div>
+        <label for="position">Position:</label>
+        <input type="text" id="position" name="position" required />
 
-          <div>
-            <label for="name" class="block font-semibold mb-1">Employee Name</label>
-            <input type="text" id="name" name="Name" required class="w-full p-2 border border-gray-300 rounded" />
-          </div>
-
-          <div>
-            <label for="position" class="block font-semibold mb-1">Position</label>
-            <input type="text" id="position" name="position" required class="w-full p-2 border border-gray-300 rounded" />
-          </div>
-
-          <div>
-            <label for="status" class="block font-semibold mb-1">Status</label>
-            <select id="status" name="Status" required class="w-full p-2 border border-gray-300 rounded">
-              <option value="">Select Status</option>
-              <option value="Annual Leave">Annual Leave</option>
-              <option value="Emergency Leave">Emergency Leave</option>
-              <option value="Terminate">Terminate</option>
-              <option value="Resigned">Resigned</option>
-              <option value="Transfer Out">Transfer Out</option>
-              <option value="Upcoming Leave">Upcoming Leave</option>
-              <option value="Sanctioned Leave">Sanctioned Leave</option>
-            </select>
-          </div>
-
-          <div class="md:col-span-2">
-            <label for="remark" class="block font-semibold mb-1">Remark</label>
-            <textarea name="Remark" id="remark" rows="3" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter additional details..."></textarea>
-          </div>
-
-          <div class="md:col-span-2 flex justify-end">
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Submit</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Fetch and Filter Section -->
-      <div id="fetchSection" class="bg-white p-6 rounded-lg shadow-md hidden w-full max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-          <input type="text" id="filterId" placeholder="Filter by Employee ID" class="flex-1 p-2 border border-gray-300 rounded" />
-          <select id="filterStatus" class="p-2 border border-gray-300 rounded">
-            <option value="">All Statuses</option>
+        <label for="status">Status:</label>
+        <div>
+          <select id="status" name="Status" required>
+            <option value="">Select Status</option>
             <option value="Annual Leave">Annual Leave</option>
             <option value="Emergency Leave">Emergency Leave</option>
             <option value="Terminate">Terminate</option>
@@ -84,43 +136,36 @@
             <option value="Transfer Out">Transfer Out</option>
             <option value="Upcoming Leave">Upcoming Leave</option>
             <option value="Sanctioned Leave">Sanctioned Leave</option>
+         
           </select>
+          <textarea
+            name="Remark"
+            id="remark"
+            placeholder="Enter additional details..."
+          ></textarea>
         </div>
-        <div id="rowDisplayContainer"></div>
-      </div>
+
+        <button type="submit">Submit</button>
+      </form>
     </div>
 
     <script>
-      const API_BASE_URL = "https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec";
-      const SHEET_NAME = "Sheet4";
-
-      let allData = [];
-      let manpowerData = [];
-
-      function toggleSection(id) {
-        document.getElementById('submitSection').classList.add('hidden');
-        document.getElementById('fetchSection').classList.add('hidden');
-        document.getElementById(id).classList.remove('hidden');
-      }
-
-      // Get API key from input field
-      function getApiKey() {
-        return document.getElementById('apiKeyInput').value.trim();
-      }
-
       document.addEventListener("DOMContentLoaded", function () {
-        // Load manpower data for autofill
-        fetch(`${API_BASE_URL}?sheet=Sheet3`)
-          .then((response) => response.json())
-          .then((data) => {
-            manpowerData = data;
-          })
-          .catch((error) => console.error("Error fetching manpower data:", error));
+        let manpowerData = [];
 
-        // Autofill name/position on ID input
+    // Fetch manpower data from Sheet3 API (GET)
+fetch("https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=Sheet3")
+  .then((response) => response.json())
+  .then((data) => {
+    manpowerData = data;
+  })
+  .catch((error) => console.error("Error fetching manpower data:", error));
+
+
         document.getElementById("id").addEventListener("input", function () {
           const empId = this.value.trim();
           const employee = manpowerData.find((emp) => emp.ID == empId);
+
           if (employee) {
             document.getElementById("name").value = employee.Name;
             document.getElementById("position").value = employee.Position;
@@ -129,167 +174,33 @@
             document.getElementById("position").value = "";
           }
         });
-
-        // Submit form
-        document.getElementById("employeeForm").addEventListener("submit", (e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          // POST does not require API key (assuming your API allows it)
-          fetch(`${API_BASE_URL}?sheet=${SHEET_NAME}`, {
-            method: "POST",
-            body: formData,
-          })
-          .then(() => {
-            alert("Entry submitted successfully!");
-            e.target.reset();
-            fetchAllAndInit();
-          })
-          .catch((error) => console.error("Error:", error));
-        });
-
-        // Load all data initially
-        fetchAllAndInit();
-
-        // Filter inputs
-        document.getElementById("filterId").addEventListener("input", applyFilters);
-        document.getElementById("filterStatus").addEventListener("change", applyFilters);
       });
-
-      function fetchAllAndInit() {
-        fetch(`${API_BASE_URL}?sheet=${SHEET_NAME}`)
-          .then(res => res.json())
-          .then(data => {
-            allData = data;
-            renderTable(allData);
-          })
-          .catch(err => {
-            console.error("Error fetching data:", err);
-            alert("Failed to load data.");
-          });
-      }
-
-      function applyFilters() {
-        const idFilter = document.getElementById("filterId").value.trim().toLowerCase();
-        const statusFilter = document.getElementById("filterStatus").value;
-        const filtered = allData.filter(row => {
-          const matchesId = !idFilter || String(row.Id).toLowerCase().includes(idFilter);
-          const matchesStatus = !statusFilter || row.Status === statusFilter;
-          return matchesId && matchesStatus;
-        });
-        renderTable(filtered);
-      }
-
-      function renderTable(data) {
-        const container = document.getElementById("rowDisplayContainer");
-        if (!data.length) {
-          container.innerHTML = `<p class="text-red-500 font-medium">No matching records found.</p>`;
-          return;
+      function checkPassword() {
+        const passwordInput = document.getElementById("passwordInput").value;
+        if (passwordInput === "adil9760") {
+          document.getElementById("passwordContainer").classList.add("hidden");
+          document.getElementById("formContainer").classList.remove("hidden");
+        } else {
+          alert("Incorrect password! Access denied.");
         }
-
-        container.innerHTML = `
-  <div class="overflow-x-auto">
-    <table class="table-auto w-full text-sm text-left text-gray-700 border">
-      <thead class="bg-gray-200 text-gray-700 uppercase text-xs">
-        <tr>
-          ${Object.keys(data[0])
-            .filter(key => key !== "Date")
-            .map(key => `<th class="p-2">${key}</th>`)
-            .join("")}
-          <th class="p-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data
-          .map(record => `
-            <tr class="bg-white border-t">
-              ${Object.entries(record)
-                .filter(([key]) => key !== "Date")
-                .map(([key, val]) => `
-                  <td contenteditable="true" data-key="${key}" class="p-2 border border-gray-200 focus:outline-blue-500">
-                    ${val}
-                  </td>`).join("")}
-              <td class="p-2 space-x-2 whitespace-nowrap">
-                <button onclick="updateRow('${record.Id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Save</button>
-                <button onclick="deleteRow('${record.Id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
-              </td>
-            </tr>
-          `).join("")}
-      </tbody>
-    </table>
-  </div>
-`;
       }
 
-      function updateRow(id) {
-        const apiKey = getApiKey();
-        if (!apiKey) {
-          alert("Please enter API key to update.");
-          return;
-        }
-        // Find row by id
-        const row = [...document.querySelectorAll(`#rowDisplayContainer tr`)].find(r =>
-          r.querySelector("td")?.innerText.trim() === String(id)
-        );
-        if (!row) {
-          alert("Row not found.");
-          return;
-        }
+      const form = document.getElementById("employeeForm");
 
-        const cells = row.querySelectorAll("td[contenteditable]");
-        const updatedData = {};
-        cells.forEach(cell => {
-          updatedData[cell.dataset.key] = cell.innerText.trim();
-        });
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-        fetch(`${API_BASE_URL}?sheet=${SHEET_NAME}&apiKey=${encodeURIComponent(apiKey)}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(updatedData)
-        })
-        .then(res => {
-          if (!res.ok) throw new Error("API error");
-          return res.text();
-        })
-        .then(() => {
-          alert("Row updated successfully.");
-          fetchAllAndInit();
-        })
-        .catch(err => {
-          console.error("Error updating row:", err);
-          alert("Failed to update row. Check API key and try again.");
-        });
-      }
+        const formData = new FormData(form);
+        const scriptUrl =
+          "https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=Sheet4";
 
-      function deleteRow(id) {
-        const apiKey = getApiKey();
-        if (!apiKey) {
-          alert("Please enter API key to delete.");
-          return;
-        }
-        if (!confirm("Are you sure you want to delete this row?")) return;
+        fetch(scriptUrl, {
+          method: "POST",
+          body: formData,
+        }).catch((error) => console.error("Error:", error));
 
-        fetch(`${API_BASE_URL}?sheet=${SHEET_NAME}&apiKey=${encodeURIComponent(apiKey)}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ Id: id })
-        })
-        .then(res => {
-          if (!res.ok) throw new Error("API error");
-          return res.text();
-        })
-        .then(() => {
-          alert("Row deleted successfully.");
-          fetchAllAndInit();
-        })
-        .catch(err => {
-          console.error("Error deleting row:", err);
-          alert("Failed to delete row. Check API key and try again.");
-        });
-      }
+        form.reset(); // Reset form immediately after submission
+      });
     </script>
   </body>
 </html>
