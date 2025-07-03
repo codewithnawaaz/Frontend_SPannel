@@ -125,6 +125,15 @@
         <label for="position">Position:</label>
         <input type="text" id="position" name="position" required />
 
+        <label for="departure">Departure:</label>
+        <input type="text" id="departure" name="Departure" />
+
+        <label for="return">Return:</label>
+        <input type="text" id="return" name="Return" />
+
+        <label for="mobile">Mobile:</label>
+        <input type="text" id="mobile" name="Mobile" />
+
         <label for="status">Status:</label>
         <div>
           <select id="status" name="Status" required>
@@ -136,7 +145,6 @@
             <option value="Transfer Out">Transfer Out</option>
             <option value="Upcoming Leave">Upcoming Leave</option>
             <option value="Sanctioned Leave">Sanctioned Leave</option>
-         
           </select>
           <textarea
             name="Remark"
@@ -153,14 +161,13 @@
       document.addEventListener("DOMContentLoaded", function () {
         let manpowerData = [];
 
-    // Fetch manpower data from Sheet3 API (GET)
-fetch("https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=Sheet3")
-  .then((response) => response.json())
-  .then((data) => {
-    manpowerData = data;
-  })
-  .catch((error) => console.error("Error fetching manpower data:", error));
-
+        // Fetch manpower data from Sheet3
+        fetch("https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=Sheet3")
+          .then((response) => response.json())
+          .then((data) => {
+            manpowerData = data;
+          })
+          .catch((error) => console.error("Error fetching manpower data:", error));
 
         document.getElementById("id").addEventListener("input", function () {
           const empId = this.value.trim();
@@ -175,6 +182,7 @@ fetch("https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot
           }
         });
       });
+
       function checkPassword() {
         const passwordInput = document.getElementById("passwordInput").value;
         if (passwordInput === "adil9760") {
@@ -187,20 +195,24 @@ fetch("https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot
 
       const form = document.getElementById("employeeForm");
 
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
+     form.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-        const formData = new FormData(form);
-        const scriptUrl =
-          "https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=Sheet4";
+  const formData = new FormData(form);
+  const scriptUrl =
+    "https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=Sheet4";
 
-        fetch(scriptUrl, {
-          method: "POST",
-          body: formData,
-        }).catch((error) => console.error("Error:", error));
+  form.reset(); // 🔄 Immediately clear the form BEFORE sending
 
-        form.reset(); // Reset form immediately after submission
-      });
+  fetch(scriptUrl, {
+    method: "POST",
+    body: formData,
+  }).catch((error) => {
+    console.error("Error:", error);
+  });
+});
+
+
     </script>
   </body>
 </html>
