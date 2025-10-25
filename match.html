@@ -1,135 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Attendance Creator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
-  </head>
-  <body class="bg-gray-100 p-6">
-    <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
-      Match Manpower
-    </h1>
 
-    <div id="message" class="text-center mb-4 text-blue-600 font-semibold"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance Creator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+</head>
 
-    <!-- Input Fields -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-      <div>
-        <label class="block font-semibold text-gray-700">Names</label>
-        <textarea id="names" placeholder="Auto-filled from API" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
-      </div>
-      <div>
-        <label class="block font-semibold text-gray-700">Positions</label>
-        <textarea id="positions" placeholder="Auto-filled from API" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
-      </div>
-      <div>
-        <label class="block font-semibold text-gray-700">IDs</label>
-        <textarea id="ids" placeholder="Auto-filled from API" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
-      </div>
-      <div>
-        <label class="block font-semibold text-gray-700">Input Ids</label>
-        <textarea id="biometricIds" placeholder="Paste biometric IDs here" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
-      </div>
+<body class="bg-gray-100 p-6">
+  <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
+    Match Manpower
+  </h1>
+
+  <div id="message" class="text-center mb-4 text-blue-600 font-semibold"></div>
+
+  <!-- Input Fields -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+    <div>
+      <label class="block font-semibold text-gray-700">Names</label>
+      <textarea id="names" placeholder="Auto-filled from API"
+        class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
     </div>
-
-    <!-- Buttons -->
-    <div class="flex flex-wrap gap-4 mb-6">
-      <button onclick="loadDataFromAPI()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded">
-        Load Data from Sheet
-      </button>
-      <button onclick="addBulkRows()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded">
-        Add Bulk Data
-      </button>
-      <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded">
-        Export to Excel
-      </button>
+    <div>
+      <label class="block font-semibold text-gray-700">Positions</label>
+      <textarea id="positions" placeholder="Auto-filled from API"
+        class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
     </div>
-
-    <!-- Attendance Table -->
-    <div class="overflow-x-auto bg-white rounded shadow-md p-4">
-      <table id="manpowerTable" class="min-w-full border border-gray-300">
-        <thead>
-          <tr class="bg-gray-200 text-gray-700 text-sm">
-            <th class="border px-3 py-2">SN</th>
-            <th class="border px-3 py-2">Name</th>
-            <th class="border px-3 py-2">Position</th>
-            <th class="border px-3 py-2">ID</th>
-            <th class="border px-3 py-2">Input Ids</th>
-            <th class="border px-3 py-2">Result</th>
-          </tr>
-        </thead>
-        <tbody class="text-center text-sm bg-white"></tbody>
-      </table>
+    <div>
+      <label class="block font-semibold text-gray-700">IDs</label>
+      <textarea id="ids" placeholder="Auto-filled from API" class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
     </div>
-
-    <!-- Summary -->
-    <div id="summary" class="mt-6 bg-white p-4 border border-gray-300 rounded shadow-sm w-fit">
-      <strong class="text-gray-700">Position-wise Present Summary:</strong>
-      <ul id="summaryList" class="mt-2 list-disc list-inside text-sm text-gray-600"></ul>
+    <div>
+      <label class="block font-semibold text-gray-700">Input Ids</label>
+      <textarea id="biometricIds" placeholder="Paste biometric IDs here"
+        class="w-full h-28 p-2 border rounded shadow-sm"></textarea>
     </div>
+  </div>
 
-    <script>
-      let snCounter = 1;
-      let manpowerData = [];
+  <!-- Buttons -->
+  <div class="flex flex-wrap gap-4 mb-6">
+    <button onclick="loadDataFromAPI()"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded">
+      Load Data from Sheet
+    </button>
+    <button onclick="addBulkRows()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded">
+      Add Bulk Data
+    </button>
+    <button onclick="exportToExcel()"
+      class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded">
+      Export to Excel
+    </button>
+  </div>
 
-      // ✅ Fetch data from Google Sheet API
-      async function loadDataFromAPI() {
-        document.getElementById("message").textContent = "⏳ Loading data from Google Sheet...";
-        try {
-          const response = await fetch("https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=manpower"); // 👈 Replace this
-          const data = await response.json();
+  <!-- Attendance Table -->
+  <div class="overflow-x-auto bg-white rounded shadow-md p-4">
+    <table id="manpowerTable" class="min-w-full border border-gray-300">
+      <thead>
+        <tr class="bg-gray-200 text-gray-700 text-sm">
+          <th class="border px-3 py-2">SN</th>
+          <th class="border px-3 py-2">Name</th>
+          <th class="border px-3 py-2">Position</th>
+          <th class="border px-3 py-2">ID</th>
+          <th class="border px-3 py-2">Input Ids</th>
+          <th class="border px-3 py-2">Result</th>
+        </tr>
+      </thead>
+      <tbody class="text-center text-sm bg-white"></tbody>
+    </table>
+  </div>
 
-          if (data && data.length > 0) {
-            manpowerData = data;
+  <!-- Summary -->
+  <div id="summary" class="mt-6 bg-white p-4 border border-gray-300 rounded shadow-sm w-fit">
+    <strong class="text-gray-700">Position-wise Present Summary:</strong>
+    <ul id="summaryList" class="mt-2 list-disc list-inside text-sm text-gray-600"></ul>
+  </div>
 
-            // Fill textareas
-            document.getElementById("names").value = data.map(d => d.Name).join("\n");
-            document.getElementById("positions").value = data.map(d => d.Position).join("\n");
-            document.getElementById("ids").value = data.map(d => d.ID).join("\n");
+  <script>
+    let snCounter = 1;
+    let manpowerData = [];
 
-            document.getElementById("message").textContent = "✅ Data loaded successfully! Please enter biometric IDs to create attendance.";
-            document.getElementById("message").classList.add("text-green-600");
-          } else {
-            document.getElementById("message").textContent = "⚠️ No data found in Google Sheet.";
-          }
-        } catch (error) {
-          console.error(error);
-          document.getElementById("message").textContent = "❌ Error loading data from API.";
+    // ✅ Fetch data from Google Sheet API
+    async function loadDataFromAPI() {
+      document.getElementById("message").textContent = "⏳ Loading data from Google Sheet...";
+      try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbwdVbbpVGj28LdvI1m9Vg7c_GtHBZ10ot62qyEHTtVq5OsC_ujFrTLjy6Dmtm4E3xE/exec?sheet=manpower"); // 👈 Replace this
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          manpowerData = data;
+
+          // Fill textareas
+          document.getElementById("names").value = data.map(d => d.Name).join("\n");
+          document.getElementById("positions").value = data.map(d => d.Position).join("\n");
+          document.getElementById("ids").value = data.map(d => d.ID).join("\n");
+
+          document.getElementById("message").textContent = "✅ Data loaded successfully! Please enter biometric IDs to create attendance.";
+          document.getElementById("message").classList.add("text-green-600");
+        } else {
+          document.getElementById("message").textContent = "⚠️ No data found in Google Sheet.";
         }
+      } catch (error) {
+        console.error(error);
+        document.getElementById("message").textContent = "❌ Error loading data from API.";
+      }
+    }
+
+    // ✅ Generate Attendance Table
+    function addBulkRows() {
+      const names = document.getElementById("names").value.trim().split("\n").map(n => n.trim());
+      const positions = document.getElementById("positions").value.trim().split("\n").map(p => p.trim());
+      const ids = document.getElementById("ids").value.trim().split("\n").map(i => i.trim());
+      const biometricIds = new Set(document.getElementById("biometricIds").value.trim().split("\n").map(b => b.trim()));
+
+      const tableBody = document.querySelector("#manpowerTable tbody");
+      tableBody.innerHTML = "";
+      snCounter = 1;
+      const positionCount = {};
+
+      if (names.length !== ids.length || ids.length !== positions.length) {
+        alert("Names, Positions, and IDs must have the same number of rows!");
+        return;
       }
 
-      // ✅ Generate Attendance Table
-      function addBulkRows() {
-        const names = document.getElementById("names").value.trim().split("\n").map(n => n.trim());
-        const positions = document.getElementById("positions").value.trim().split("\n").map(p => p.trim());
-        const ids = document.getElementById("ids").value.trim().split("\n").map(i => i.trim());
-        const biometricIds = new Set(document.getElementById("biometricIds").value.trim().split("\n").map(b => b.trim()));
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        const position = positions[i];
+        const id = ids[i];
+        const biometricId = biometricIds.has(id) ? id : "Not Match";
+        const attendance = biometricId === "Not Match" ? "A" : "P";
 
-        const tableBody = document.querySelector("#manpowerTable tbody");
-        tableBody.innerHTML = "";
-        snCounter = 1;
-        const positionCount = {};
-
-        if (names.length !== ids.length || ids.length !== positions.length) {
-          alert("Names, Positions, and IDs must have the same number of rows!");
-          return;
+        if (attendance === "P") {
+          positionCount[position] = (positionCount[position] || 0) + 1;
         }
 
-        for (let i = 0; i < names.length; i++) {
-          const name = names[i];
-          const position = positions[i];
-          const id = ids[i];
-          const biometricId = biometricIds.has(id) ? id : "Not Match";
-          const attendance = biometricId === "Not Match" ? "A" : "P";
-
-          if (attendance === "P") {
-            positionCount[position] = (positionCount[position] || 0) + 1;
-          }
-
-          const row = document.createElement("tr");
-          row.innerHTML = `
+        const row = document.createElement("tr");
+        row.innerHTML = `
             <td class="border px-2 py-1">${snCounter++}</td>
             <td class="border px-2 py-1">${name}</td>
             <td class="border px-2 py-1">${position}</td>
@@ -137,13 +144,13 @@
             <td class="border px-2 py-1">${biometricId}</td>
             <td class="border px-2 py-1 ${attendance === "P" ? 'text-green-600' : 'text-red-600'}">${attendance}</td>
           `;
-          tableBody.appendChild(row);
-        }
+        tableBody.appendChild(row);
+      }
 
-        biometricIds.forEach((bioId) => {
-          if (!ids.includes(bioId)) {
-            const row = document.createElement("tr");
-            row.innerHTML = `
+      biometricIds.forEach((bioId) => {
+        if (!ids.includes(bioId)) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
               <td class="border px-2 py-1">${snCounter++}</td>
               <td class="border px-2 py-1 text-red-600">Not in List</td>
               <td class="border px-2 py-1 text-red-600">Not in List</td>
@@ -151,31 +158,32 @@
               <td class="border px-2 py-1">${bioId}</td>
               <td class="border px-2 py-1 text-red-600">Not Match</td>
             `;
-            tableBody.appendChild(row);
-          }
-        });
-
-        updatePositionSummary(positionCount);
-        document.getElementById("biometricIds").value = "";
-      }
-
-      function updatePositionSummary(positionCount) {
-        const summaryList = document.getElementById("summaryList");
-        summaryList.innerHTML = "";
-        for (const [position, count] of Object.entries(positionCount)) {
-          const li = document.createElement("li");
-          li.textContent = `${position} - ${count}`;
-          summaryList.appendChild(li);
+          tableBody.appendChild(row);
         }
-      }
+      });
 
-      function exportToExcel() {
-        const table = document.getElementById("manpowerTable");
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.table_to_sheet(table);
-        XLSX.utils.book_append_sheet(wb, ws, "Attendance");
-        XLSX.writeFile(wb, "manpower_attendance.xlsx");
+      updatePositionSummary(positionCount);
+      document.getElementById("biometricIds").value = "";
+    }
+
+    function updatePositionSummary(positionCount) {
+      const summaryList = document.getElementById("summaryList");
+      summaryList.innerHTML = "";
+      for (const [position, count] of Object.entries(positionCount)) {
+        const li = document.createElement("li");
+        li.textContent = `${position} - ${count}`;
+        summaryList.appendChild(li);
       }
-    </script>
-  </body>
+    }
+
+    function exportToExcel() {
+      const table = document.getElementById("manpowerTable");
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(table);
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+      XLSX.writeFile(wb, "manpower_attendance.xlsx");
+    }
+  </script>
+</body>
+
 </html>
